@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://api.jsonbin.io; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>DA Team Tracker — Orange Business</title>
 <link href="https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -7479,8 +7481,11 @@ h2 { page-break-after: avoid; }
 ${sections}
 </body></html>`;
 
-  const w = window.open('', '_blank');
+  // Keep same-origin access to the about:blank popup so we can write
+  // the printable HTML, then explicitly sever opener for safety.
+  const w = window.open('about:blank', '_blank');
   if (!w) { toast('Popup blocked — allow popups for this site', 'error'); return; }
+  try { w.opener = null; } catch (e) {}
   w.document.write(html);
   w.document.close();
   toast('Print dialog opened — choose "Save as PDF"', 'success');
